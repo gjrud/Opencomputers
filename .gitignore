@@ -178,3 +178,8 @@ usr/man/yes
 usr/misc/greetings.txt
 init.lua
 Opencomputer Workspace.code-workspace
+usr/bin/gmltest.lua
+usr/bin/savedlg.lua
+usr/lib/gml.lua
+usr/lib/gfxbuffer.lua
+usr/default.gss
