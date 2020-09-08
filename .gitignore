@@ -183,3 +183,7 @@ usr/bin/savedlg.lua
 usr/lib/gml.lua
 usr/lib/gfxbuffer.lua
 usr/default.gss
+etc/edit.cfg
+etc/opdata.svd
+etc/oppm.cfg
+usr/bin/oppm.lua

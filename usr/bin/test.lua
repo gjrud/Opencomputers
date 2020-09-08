@@ -1,70 +1,46 @@
--- # Person. Our 'Base' class for a set of more complex classes.
-local Person = {} -- # Use Person(name, age, sex) to use as an instance constructor.
-Person.__index = Person
-setmetatable(Person, {
-  __call = function(_, name, age, sex)
-  	local person = {
-      name = name,
-      age = age,
-      sex = sex
-    }
-    
-    return setmetatable(person, Person)
-  end
-})
+Set = {}
 
-function Person:introduce()
-  return ("Hello, my name is %s."):format(self.name)
+function Set.new(t)
+    local set = {}
+    setmetatable(set, Set.mt)
+    for _, l in ipairs(t) do set[l] = true end
+    return set
 end
 
-function Person:greet(otherPerson)
-  return self:introduce() .. (" Nice to meet you %s."):format(otherPerson.name)
+function Set.union(a, b)
+    local res = Set.new {}
+    for k in pairs(a) do res[k] = true end
+    for k in pairs(b) do res[k] = true end
+    return res
 end
 
-
--- # Now we can create 'Persons' or 'instances' of Persons as we call them in OOP.
-local bob = Person('Bob', 49, 'male')
-local jane = Person('Jane', 33, 'female')
-
-print( bob:greet(jane) ) -- # > "Hello, my name is Bob. Nice to meet you Jane."
-
--- # This is where OOP really shines and why it would be recommeneded. 'Inheritance'.
-local Wizard = {}
-Wizard.__index = Wizard
-
-setmetatable(Wizard, {
-  __call = function(_, name, age, sex, spells)
-  	local wizard = Person(name, age, sex) -- # create a wizard from the Person class. Wizards are people too. Not all People are Wizards.
-    wizard.spells = spells -- # Wizard specific
-    
-    return setmetatable(wizard, Wizard) -- # bestow Wizard methods upon wizard instance.
-  end,
-  
-  -- # inheritance
-  __index = Person -- # If a method or field isn't within a 'Wizard' then fallback to the 'Base' which is 'Person'. i.e wizardInstance:greet(bob)
-})
-
--- # Sub-class method override.
-function Wizard:introduce() -- # Wizard introductions should state the prestige that they are Wizards!
-  return ("Hello, my name is %s the wizard."):format(self.name)
+function Set.intersection(a, b)
+    local res = Set.new {}
+    for k in pairs(a) do res[k] = b[k] end
+    return res
 end
 
--- # Wizard:greet is inherited from Person. 
-
-function Wizard:cast(spell, target)
-  assert(self.spells[spell], "Invalid spell. Your Wizard is weak.")
-  return ("%s the wizard casts '%s' upon %s for %d damage."):format(self.name, spell, target.name, self.spells[spell].damage)
+function Set.tostring(set)
+    local s = "{"
+    local sep = ""
+    for e in pairs(set) do
+        s = s .. sep .. e
+        sep = ", "
+    end
+    return s .. "}"
 end
 
-local merlin = Wizard("Merlin", 61, "male", {
-  ["Abbra"] = {
-  	name = "Abbra",
-    damage = 12
-  }
-})
+function Set.print(s) print(Set.tostring(s)) end
 
--- # Notice :greet() is inherited from Person class but uses the merlin instances version of :introduce()
-print( merlin:greet(bob) ) -- # > "Hello, my name is Merlin the wizard. Nice to meet you Bob."
-print( merlin:cast('Abbra', bob) ) -- # > "Merlin the wizard casts 'Abbra' upon Bob for 12 damage."
+Set.mt = {} -- metatable for sets
+Set.mt.__add = Set.union
+Set.mt.__mul = Set.intersection
 
--- # End
+s1 = Set.new{10, 20, 30, 50}
+s2 = Set.new{30, 1}
+print(getmetatable(s1))
+print(getmetatable(s2))
+
+s3 = s1 + s2
+Set.print(s3)
+Set.print((s1 + s2)*s1)
